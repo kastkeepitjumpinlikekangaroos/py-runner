@@ -1,7 +1,8 @@
+import multiprocessing
 import socket
 import os
 
-for _ in range(100):
+def run_test(j):
     for i in range(os.cpu_count()):
 
         socket_loc = f'/tmp/py_runner{i}.sock'
@@ -38,4 +39,8 @@ print(answer.tolist())
 
         print('Output:')
         print(output)
+
+with multiprocessing.Pool() as p:
+    iter_ = [i for i in range(100)]
+    p.map(run_test, iter_)
 
