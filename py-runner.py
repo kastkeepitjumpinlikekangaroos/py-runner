@@ -8,8 +8,9 @@ import socket
 HOST = '127.0.0.1'
 PORT = 65432
 
-connections = []
-
+# TODO: add message length to the begenning of message so we can specify how many bytes to read
+# TODO: use unix sockets instead of tcp/ip
+# TODO: add some way to dynamically spawn new workers (with new socket server) so we can handle multiple connections at once
 
 def get_input():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
