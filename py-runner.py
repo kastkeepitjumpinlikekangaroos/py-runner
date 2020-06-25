@@ -1,13 +1,11 @@
 import os
 import traceback
 import subprocess
-import concurrent.futures
 import rx
 from rx import operators as ops
+from rx.scheduler import ThreadPoolScheduler
 import tempfile
 import socket
-
-# TODO: add some way to dynamically spawn new workers (with new socket server) so we can handle multiple connections at once
 
 def get_input(socket_loc: str):
     with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
@@ -20,7 +18,7 @@ def get_input(socket_loc: str):
             conn, addr = s.accept()
             lines = []
             with conn:
-                print('Connected by', addr)
+                print(f'Handling requests on {socket_loc}')
                 message_len_raw = conn.recv(128)
                 message_len_decoded = message_len_raw.decode()
                 message_len = int(message_len_decoded.replace('-', '')) 
@@ -51,17 +49,17 @@ def get_output(output):
     print(decoded_out)
     return decoded_out 
 
+socket_locs = [f'/tmp/py_runner{i}.sock' for i in range(os.cpu_count())]
 
-def return_item(item):
-    return item
-
-socket_loc = '/tmp/py_runner.sock'
-
-with concurrent.futures.ThreadPoolExecutor(5) as executor: 
+executor = ThreadPoolScheduler()
+for socket_loc in socket_locs:
     rx.from_(get_input(socket_loc)).pipe(
-        ops.flat_map(lambda item: executor.submit(return_item, item)),
-    ).subscribe(get_output)
-    
+        ops.map(lambda x: x),
+        ops.subscribe_on(executor),
+    ).subscribe(get_output, lambda e: print(e), lambda: print('Finished execution'))
 
-print("Done executing")
+end = ''
+while end != 'q':
+    end = input('Enter q to quit: ')
+    print()
 
