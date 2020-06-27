@@ -18,7 +18,7 @@ def get_input(socket_loc: str):
             conn, addr = s.accept()
             lines = []
             with conn:
-                print(f'Handling requests on {socket_loc}')
+                print(f'Handling request on {socket_loc}')
                 message_len_raw = conn.recv(128)
                 message_len_decoded = message_len_raw.decode()
                 message_len = int(message_len_decoded.replace('-', '')) 
@@ -33,7 +33,7 @@ def get_input(socket_loc: str):
                     f.write(code.encode())
                     f.seek(0)
                     try:
-                        output = subprocess.check_output(f'python3 {f.name}', shell=True, stderr=subprocess.STDOUT)  
+                        output = subprocess.check_output(f'python {f.name}', shell=True, stderr=subprocess.STDOUT)  
                     except subprocess.CalledProcessError as e:
                         output = traceback.format_exc().encode()
                         print(output)
@@ -57,9 +57,4 @@ for socket_loc in socket_locs:
         ops.map(lambda x: x),
         ops.subscribe_on(executor),
     ).subscribe(get_output, lambda e: print(e), lambda: print('Finished execution'))
-
-end = ''
-while end != 'q':
-    end = input('Enter q to quit: ')
-    print()
 

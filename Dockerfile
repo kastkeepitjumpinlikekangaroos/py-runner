@@ -8,5 +8,5 @@ COPY ./ ./
 
 RUN pip install -r requirements.txt
 
-CMD ["sh", "-c", "python to_run.py"]
+CMD ["sh", "-c", "python py-runner.py"]
 
