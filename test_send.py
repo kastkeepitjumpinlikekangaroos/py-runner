@@ -3,10 +3,12 @@ import socket
 import os
 import random
 
+SOCKETS_DIR = '/tmp/.py-runner'
+
 
 def run_test(j):
     i = random.randint(0, os.cpu_count() - 1)
-    socket_loc = f'/tmp/py_runner{i}.sock'
+    socket_loc = f'/{SOCKETS_DIR}/py_runner{i}.sock'
 
     with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
         s.connect(socket_loc)

@@ -7,6 +7,11 @@ from rx.scheduler import ThreadPoolScheduler
 import tempfile
 import socket
 
+SOCKETS_DIR = '/tmp/.py-runner'
+
+if not os.path.exists(SOCKETS_DIR):
+    os.mkdir(SOCKETS_DIR)
+
 def get_input(socket_loc: str):
     with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
         if os.path.exists(socket_loc):
@@ -49,7 +54,7 @@ def get_output(output):
     print(decoded_out)
     return decoded_out 
 
-socket_locs = [f'/tmp/py_runner{i}.sock' for i in range(os.cpu_count())]
+socket_locs = [f'{SOCKETS_DIR}/py_runner{i}.sock' for i in range(os.cpu_count())]
 
 executor = ThreadPoolScheduler()
 for socket_loc in socket_locs:
