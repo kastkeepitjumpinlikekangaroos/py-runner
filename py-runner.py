@@ -22,13 +22,12 @@ def get_input(socket_loc: str):
         print(f'Listening to socket located at {socket_loc}')
         while True:
             conn, addr = s.accept()
-            lines = []
             with conn:
                 print(f'Handling request on {socket_loc}')
                 message_len_raw = conn.recv(128)
                 message_len_decoded = message_len_raw.decode()
-                message_len = int(message_len_decoded.replace('-', '')) 
-                    
+                message_len = int(message_len_decoded.replace('-', ''))
+
                 message = conn.recv(message_len)
                 code = message.decode()
 
@@ -39,9 +38,10 @@ def get_input(socket_loc: str):
                     f.write(code.encode())
                     f.seek(0)
                     try:
-                        output = subprocess.check_output(f'python {f.name}', shell=True, stderr=subprocess.STDOUT)  
+                        output = subprocess.check_output(f'python {f.name}', shell=True, stderr=subprocess.STDOUT)
                     except subprocess.CalledProcessError as e:
                         output = traceback.format_exc().encode()
+                        output = f'Error: e\n\n{output}'
                         print(output)
                     message_len = len(output)
                     header = str(message_len)
@@ -53,7 +53,8 @@ def get_input(socket_loc: str):
 def get_output(output):
     decoded_out = output.decode()
     print(decoded_out)
-    return decoded_out 
+    return decoded_out
+
 
 socket_locs = [f'{SOCKETS_DIR}/py_runner{i}.sock' for i in range(os.cpu_count())]
 
@@ -63,4 +64,3 @@ for socket_loc in socket_locs:
         ops.map(lambda x: x),
         ops.subscribe_on(executor),
     ).subscribe(get_output, lambda e: print(e), lambda: print('Finished execution'))
-

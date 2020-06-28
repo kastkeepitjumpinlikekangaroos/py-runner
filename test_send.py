@@ -33,17 +33,17 @@ print(answer.tolist())
         header = str(message_len)
         header = header + '-' * (128 - len(header))  # pad first 128 bytes
         s.sendall(header.encode() + code)
-        
+
         message_len_raw = s.recv(128)
         message_len_decoded = message_len_raw.decode()
-        message_len = int(message_len_decoded.replace('-', '')) 
+        message_len = int(message_len_decoded.replace('-', ''))
         message = s.recv(message_len)
         output = message.decode()
 
     print('Output:')
     print(output)
 
+
 with multiprocessing.Pool() as p:
     iter_ = [i for i in range(400)]
     p.map(run_test, iter_)
-
