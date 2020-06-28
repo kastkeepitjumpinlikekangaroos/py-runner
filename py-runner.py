@@ -41,7 +41,7 @@ def get_input(socket_loc: str):
                         output = subprocess.check_output(f'python {f.name}', shell=True, stderr=subprocess.STDOUT)
                     except subprocess.CalledProcessError as e:
                         output = traceback.format_exc().encode()
-                        output = f'Error: e\n\n{output}'
+                        output = f'Error: {e}\n\n{output}'
                         print(output)
                     message_len = len(output)
                     header = str(message_len)
