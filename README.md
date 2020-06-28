@@ -20,9 +20,6 @@ Use docker build and run scripts to build and run using docker, to run using jus
 
 `$ python py-runner.py`
 
-Test using test script:
-
-`$ python test_send.py`
 
 # Testing
 
