@@ -6,21 +6,27 @@ Creates a worker for each CPU core on the host computer. Each worker creates a s
 Make sure you have python 3.8 installed and are using it for the following commands
 
 Install requirements
+
 `$ pip install -r requirements.txt`
 
 Install pre-commit hook
+
 `$ pre-commit install --hook-type pre-push`
 
 
 # Running
 
 Use docker build and run scripts to build and run using docker, to run using just python:
+
 `$ python py-runner.py`
 
 Test using test script:
+
 `$ python test_send.py`
 
 # Testing
 
 Run all tests with coverage:
+
 `$ python -m pytest --cov=. -ref`
+
