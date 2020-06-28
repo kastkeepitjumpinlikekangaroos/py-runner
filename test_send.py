@@ -44,6 +44,6 @@ print(answer.tolist())
     print(output)
 
 with multiprocessing.Pool() as p:
-    iter_ = [i for i in range(100)]
+    iter_ = [i for i in range(400)]
     p.map(run_test, iter_)
 

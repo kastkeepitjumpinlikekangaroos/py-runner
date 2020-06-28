@@ -12,6 +12,7 @@ SOCKETS_DIR = '/tmp/.py-runner'
 if not os.path.exists(SOCKETS_DIR):
     os.mkdir(SOCKETS_DIR)
 
+
 def get_input(socket_loc: str):
     with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
         if os.path.exists(socket_loc):
