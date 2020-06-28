@@ -29,4 +29,3 @@ Test using test script:
 Run all tests with coverage:
 
 `$ python -m pytest --cov=. -ref`
-
