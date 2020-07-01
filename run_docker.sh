@@ -1,3 +1,3 @@
 #!/bin/sh
-docker run -it -v /tmp/.py-runner:/tmp/.py-runner py-runner
+docker run -it -v /tmp/.py-runner:/py-runner/.py-runner py-runner
 
