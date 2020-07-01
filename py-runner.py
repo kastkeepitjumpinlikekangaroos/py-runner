@@ -18,8 +18,8 @@ def main():
         os.mkdir(SOCKETS_DIR)
 
     socket_locs = [f'{SOCKETS_DIR}/py_runner{i}.sock' for i in range(os.cpu_count())]
-   
-    scheduler = ThreadPoolScheduler() 
+
+    scheduler = ThreadPoolScheduler()
     for socket_loc in socket_locs:
         _spawn_worker(scheduler, socket_loc)
 
@@ -50,4 +50,3 @@ def _log_error(e):
 
 if __name__ == '__main__':
     main()
-
