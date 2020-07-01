@@ -3,9 +3,9 @@ import subprocess
 import tempfile
 import socket
 import logging
+import traceback
 
-HEADER_LEN = 128 
-
+HEADER_LEN = 128
 
 
 def listen_on_unix_socket(socket_loc: str) -> bytes:
@@ -38,8 +38,7 @@ def listen_on_unix_socket(socket_loc: str) -> bytes:
                         logging.warning(output)
                     message_len = len(output)
                     header = str(message_len)
-                    header = header + '-' * (HEADER_LEN - len(header))  # encode message length in first HEADER_LEN bytes
+                    # encode message length in first HEADER_LEN bytes
+                    header = header + '-' * (HEADER_LEN - len(header))
                     conn.sendall(header.encode() + output)
                     yield output
-
-

@@ -6,7 +6,6 @@ import random
 SOCKETS_DIR = '/tmp/.py-runner'
 
 
-
 def _run_test(j):
     i = random.randint(0, os.cpu_count() - 1)
     socket_loc = f'/{SOCKETS_DIR}/py_runner{i}.sock'
@@ -49,4 +48,3 @@ def test_send():
     with multiprocessing.Pool() as p:
         iter_ = [i for i in range(400)]
         p.map(_run_test, iter_)
-

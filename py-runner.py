@@ -6,22 +6,22 @@ import rx
 from rx import operators as ops
 from rx.scheduler import ThreadPoolScheduler
 
-from lib.server import listen_on_unix_socket 
+from lib.server import listen_on_unix_socket
 
 SOCKETS_DIR = '/tmp/.py-runner'
 
 
-
-def main(scheduler: ThreadPoolScheduler):
+def main():
     logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
     if not os.path.exists(SOCKETS_DIR):
         os.mkdir(SOCKETS_DIR)
 
     socket_locs = [f'{SOCKETS_DIR}/py_runner{i}.sock' for i in range(os.cpu_count())]
-
+   
+    scheduler = ThreadPoolScheduler() 
     for socket_loc in socket_locs:
-        _spawn_worker(scheduler, socket_loc) 
+        _spawn_worker(scheduler, socket_loc)
 
 
 def _spawn_worker(scheduler: ThreadPoolScheduler, socket_loc: str):
@@ -30,14 +30,14 @@ def _spawn_worker(scheduler: ThreadPoolScheduler, socket_loc: str):
         ops.subscribe_on(scheduler),
     ).subscribe(
         _log_output,
-        _log_error, 
+        _log_error,
         lambda: logging.info(f'Finished execution on {socket_loc}')
     )
 
 
 def _log_output(output):
     decoded_out = output.decode()
-    logging.info(decoded_out) 
+    logging.info(decoded_out)
     return decoded_out
 
 
@@ -49,10 +49,5 @@ def _log_error(e):
 
 
 if __name__ == '__main__':
-    scheduler = ThreadPoolScheduler()
-    try:
-        main(scheduler)
-    except KeyboardInterupt:
-        scheduler.executor.shutdown()
-        exit(1)
+    main()
 
