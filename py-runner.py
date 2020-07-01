@@ -1,66 +1,57 @@
 import os
+import logging
 import traceback
-import subprocess
+
 import rx
 from rx import operators as ops
 from rx.scheduler import ThreadPoolScheduler
-import tempfile
-import socket
+
+from lib.server import listen_on_unix_socket 
 
 SOCKETS_DIR = '/tmp/.py-runner'
 
-if not os.path.exists(SOCKETS_DIR):
-    os.mkdir(SOCKETS_DIR)
+
+def main(scheduler: ThreadPoolScheduler):
+    logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
+
+    if not os.path.exists(SOCKETS_DIR):
+        os.mkdir(SOCKETS_DIR)
+
+    socket_locs = [f'{SOCKETS_DIR}/py_runner{i}.sock' for i in range(os.cpu_count())]
+
+    for socket_loc in socket_locs:
+        _spawn_worker(scheduler, socket_loc) 
 
 
-def get_input(socket_loc: str):
-    with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
-        if os.path.exists(socket_loc):
-            os.remove(socket_loc)
-        s.bind(socket_loc)
-        s.listen()
-        print(f'Listening to socket located at {socket_loc}')
-        while True:
-            conn, addr = s.accept()
-            with conn:
-                print(f'Handling request on {socket_loc}')
-                message_len_raw = conn.recv(128)
-                message_len_decoded = message_len_raw.decode()
-                message_len = int(message_len_decoded.replace('-', ''))
-
-                message = conn.recv(message_len)
-                code = message.decode()
-
-                print('Running:')
-                print(code)
-
-                with tempfile.NamedTemporaryFile() as f:
-                    f.write(code.encode())
-                    f.seek(0)
-                    try:
-                        output = subprocess.check_output(f'python {f.name}', shell=True, stderr=subprocess.STDOUT)
-                    except subprocess.CalledProcessError as e:
-                        output = traceback.format_exc().encode()
-                        output = f'Error: {e}\n\n{output}'
-                        print(output)
-                    message_len = len(output)
-                    header = str(message_len)
-                    header = header + '-' * (128 - len(header))  # pad first 128 bytes
-                    conn.sendall(header.encode() + output)
-                    yield output
+def _spawn_worker(scheduler: ThreadPoolScheduler, socket_loc: str):
+    rx.from_(listen_on_unix_socket(socket_loc)).pipe(
+        ops.map(lambda x: x),
+        ops.subscribe_on(scheduler),
+    ).subscribe(
+        _log_output,
+        _log_error, 
+        lambda: logging.info(f'Finished execution on {socket_loc}')
+    )
 
 
-def get_output(output):
+def _log_output(output):
     decoded_out = output.decode()
-    print(decoded_out)
+    logging.info(decoded_out) 
     return decoded_out
 
 
-socket_locs = [f'{SOCKETS_DIR}/py_runner{i}.sock' for i in range(os.cpu_count())]
+def _log_error(e):
+    err = traceback.format_exc()
+    err = f'Error: {e}\n\n{err}'
+    logging.warning(err)
+    return err
 
-executor = ThreadPoolScheduler()
-for socket_loc in socket_locs:
-    rx.from_(get_input(socket_loc)).pipe(
-        ops.map(lambda x: x),
-        ops.subscribe_on(executor),
-    ).subscribe(get_output, lambda e: print(e), lambda: print('Finished execution'))
+
+if __name__ == '__main__':
+    scheduler = ThreadPoolScheduler()
+    try:
+        main(scheduler)
+    except KeyboardInterupt:
+        scheduler.executor.shutdown()
+        exit(1)
+
