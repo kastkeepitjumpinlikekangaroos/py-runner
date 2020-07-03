@@ -8,7 +8,7 @@ from rx.scheduler import ThreadPoolScheduler
 
 from lib.server import listen_on_unix_socket
 
-SOCKETS_DIR = '.py-runner'
+SOCKETS_DIR = '/tmp/.py-runner'
 
 
 def main():

@@ -3,7 +3,7 @@ import socket
 import os
 import random
 
-SOCKETS_DIR = '.py-runner'
+SOCKETS_DIR = '/tmp/.py-runner'
 
 
 def _run_test(j):
