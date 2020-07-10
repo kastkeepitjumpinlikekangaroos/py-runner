@@ -34,7 +34,6 @@ async def _handle_connection(reader, writer, loop, executor):
     code = message.decode()
     logging.info(f'Running:\n\n{code}')
 
-
     output = await loop.run_in_executor(executor, _exec_code, code)
 
     message_len = len(output)
@@ -75,4 +74,3 @@ def _log_error(e) -> str:
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
     asyncio.run(main())
-
