@@ -1,17 +1,13 @@
 import multiprocessing
 import socket
 import os
-import random
 
-SOCKETS_DIR = '/tmp/.py-runner'
+SOCKET_LOC= '/tmp/.py-runner/py_runner.sock'
 
 
 def _run_test(j):
-    i = random.randint(0, os.cpu_count() - 1)
-    socket_loc = f'{SOCKETS_DIR}/py_runner{i}.sock'
-
     with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
-        s.connect(socket_loc)
+        s.connect(SOCKET_LOC)
         code = b'''
 import numpy as np
 import random
