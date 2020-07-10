@@ -1,8 +1,7 @@
 import multiprocessing
 import socket
-import os
 
-SOCKET_LOC= '/tmp/.py-runner/py_runner.sock'
+SOCKET_LOC = '/tmp/.py-runner/py_runner.sock'
 
 
 def _run_test(j):

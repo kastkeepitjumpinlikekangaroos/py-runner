@@ -1,11 +1,10 @@
 import asyncio
-import os
 import logging
 import traceback
 import subprocess
 import tempfile
 
-SOCKET_LOC= '/tmp/.py-runner/py_runner.sock'
+SOCKET_LOC = '/tmp/.py-runner/py_runner.sock'
 HEADER_LEN = 128
 
 
@@ -63,4 +62,3 @@ def _log_error(e):
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
     asyncio.run(main())
-
