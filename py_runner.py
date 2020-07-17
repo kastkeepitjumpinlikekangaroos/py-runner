@@ -11,9 +11,8 @@ SOCKET_LOC = '/tmp/py_runner.sock'
 HEADER_LEN = 128
 
 
-async def main():
+async def main(loop):
     logging.info('Serving on {SOCKET_LOC}'.format(SOCKET_LOC=SOCKET_LOC))
-    loop = asyncio.get_event_loop()
     executor = ThreadPoolExecutor(max_workers=os.cpu_count())
     __handle_connection = partial(_handle_connection, executor=executor, loop=loop)
     server = await asyncio.start_unix_server(__handle_connection, SOCKET_LOC)
@@ -75,4 +74,5 @@ def _log_error(e) -> str:
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
-    asyncio.run(main())
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main(loop))
