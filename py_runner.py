@@ -11,8 +11,9 @@ SOCKET_LOC = '/tmp/py_runner.sock'
 HEADER_LEN = 128
 
 
-async def main(loop):
+async def main():
     logging.info('Serving on {SOCKET_LOC}'.format(SOCKET_LOC=SOCKET_LOC))
+    loop = asyncio.get_event_loop()
     executor = ThreadPoolExecutor(max_workers=os.cpu_count())
     __handle_connection = partial(_handle_connection, executor=executor, loop=loop)
     server = await asyncio.start_unix_server(__handle_connection, SOCKET_LOC)
@@ -52,6 +53,8 @@ def _exec_code(code: str) -> bytes:
         f.seek(0)
         try:
             cmd = 'docker run py_exec -v {f_name}:/tmp/run.py'.format(f_name=f.name),
+            if os.environ.get('DEBUG'):
+                cmd = 'python3 {f_name}'.format(f_name=f.name)
             output = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as e:
             output = _log_error(e).encode()
@@ -74,5 +77,4 @@ def _log_error(e) -> str:
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main(loop))
+    asyncio.run(main())
