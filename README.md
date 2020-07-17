@@ -3,7 +3,7 @@ Creates a unix socket located at `/tmp/py_runner.sock`. When reading a message t
 
 # Running
 
-Use docker build script to create the docker container to run the python code, and then run `py_runner.py` with python 3.4+
+Use docker build script to create the docker container to run the python code, and then run `py_runner.py` with python 3.6+
 
 Build docker:
 
