@@ -12,7 +12,7 @@ HEADER_LEN = 128
 
 
 async def main():
-    logging.info('Serving on {SOCKET_LOC}'.format(SOCKET_LOC=SOCKET_LOC))
+    logging.info(f'Serving on {SOCKET_LOC}')
     loop = asyncio.get_event_loop()
     executor = ThreadPoolExecutor(max_workers=os.cpu_count())
     __handle_connection = partial(_handle_connection, executor=executor, loop=loop)
@@ -24,8 +24,7 @@ async def main():
 
 async def _handle_connection(reader, writer, loop, executor):
     addr = writer.get_extra_info('peername')
-    logging.info('Handling request for {addr} on {SOCKET_LOC}'
-                 .format(addr=addr, SOCKET_LOC=SOCKET_LOC))
+    logging.info(f'Handling request for {addr} on {SOCKET_LOC}')
 
     message_len_raw = await reader.read(HEADER_LEN)
     message_len_decoded = message_len_raw.decode()
@@ -33,7 +32,7 @@ async def _handle_connection(reader, writer, loop, executor):
 
     message = await reader.read(message_len)
     code = message.decode()
-    logging.info('Running:\n\n{code}'.format(code=code))
+    logging.info(f'Running:\n\n{code}')
 
     output = await loop.run_in_executor(executor, _exec_code, code)
 
@@ -43,7 +42,7 @@ async def _handle_connection(reader, writer, loop, executor):
     header = header + '-' * (HEADER_LEN - len(header))
     writer.write(header.encode() + output)
     await writer.drain()
-    logging.info('Close the connection for {addr}'.format(addr=addr))
+    logging.info(f'Close the connection for {addr}')
     writer.close()
 
 
@@ -52,9 +51,9 @@ def _exec_code(code: str) -> bytes:
         f.write(code.encode())
         f.seek(0)
         try:
-            cmd = 'docker run py_exec -v {f_name}:/tmp/run.py'.format(f_name=f.name),
+            cmd = f'docker run py_exec -v {f.name}:/tmp/run.py'
             if os.environ.get('DEBUG'):
-                cmd = 'python3 {f_name}'.format(f_name=f.name)
+                cmd = f'python3 {f.name}'
             output = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as e:
             output = _log_error(e).encode()
@@ -70,7 +69,7 @@ def _log_output(output: bytes) -> str:
 
 def _log_error(e) -> str:
     err = traceback.format_exc()
-    err = 'Error: {e}\n\n{err}'.format(e=e, err=err)
+    err = f'Error: {e}\n\n{err}'
     logging.warning(err)
     return err
 
