@@ -1,3 +1,7 @@
 FROM python:3.8
 
-CMD ["sh", "-c", "python /tmp/run.py"]
+RUN mkdir -p /py_exec
+
+WORKDIR /py_exec
+
+CMD ["sh", "-c", "python /py_exec/run.py"]
