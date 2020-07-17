@@ -7,7 +7,7 @@ import os
 from functools import partial
 from concurrent.futures import ThreadPoolExecutor
 
-SOCKET_LOC = '/tmp/.py-runner/py_runner.sock'
+SOCKET_LOC = '/tmp/py_runner.sock'
 HEADER_LEN = 128
 
 
@@ -51,7 +51,8 @@ def _exec_code(code: str) -> bytes:
         f.write(code.encode())
         f.seek(0)
         try:
-            output = subprocess.check_output(f'python {f.name}', shell=True, stderr=subprocess.STDOUT)
+            cmd = f'docker run py_exec -v {f.name}:/tmp/run.py',
+            output = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as e:
             output = _log_error(e).encode()
     _log_output(output)

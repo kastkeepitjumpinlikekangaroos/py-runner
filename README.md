@@ -1,28 +1,21 @@
 # Socket server for executing arbitrary python code
-Creates a worker for each CPU core on the host computer. Each worker creates a socket server that uses a local unix socket located at `/tmp/.py-runner/py_runnerN.sock` where N is the worker number (starting at 0). Each socket server reads in 128 bytes which contains the message size of the incoming python code, reads in the message containing python code using this message length, executes the python code, and returns the STDOUT to the connected client. Server is run in a docker container which shares the `/tmp/.py-runner` folder with the host OS so the host OS can communicate with the server.
-
-# Setup
-
-Make sure you have python 3.8 installed and are using it for the following commands
-
-Install requirements
-
-`$ pip install -r requirements.txt`
-
-Install pre-commit hook
-
-`$ pre-commit install --hook-type pre-push`
-
+Creates a unix socket located at `/tmp/py_runner.sock`. When reading a message the server reads in 128 bytes which contains the message size of the incoming python code padded with '-' until we reach 128 bytes. The server then uses this message length to read in a message containing python code. The server then executes the python code and returns the STDOUT to the connected client (sends the size of the message and then the message just like before). All python code is run in a docker container that is thrown away so any arbitrary code can be executed.
 
 # Running
 
-Use docker build and run scripts to build and run using docker, to run using just python:
+Use docker build script to create the docker container to run the python code, and then run `py_runner.py` with python 3.4+
 
-`$ python py-runner.py`
+Build docker:
+
+`$ ./build_docker.sh`
+
+Run server:
+
+`$ python3 py_runner.py`
 
 
 # Testing
 
-Run all tests with coverage:
+First start server and then run tests with
 
-`$ python -m pytest --cov=. -ref`
+`$ python3 -m unittest tests/test*`
