@@ -3,9 +3,11 @@ Creates a unix socket located at `/tmp/py_runner.sock`. When reading a message t
 
 # Running
 
-Build docker (if using secure mode):
+Build container (if using secure mode):
 
-`$ ./build_docker.sh`
+`$ ./build_cont.sh docker`
+or
+`$ ./build_cont.sh podman`
 
 Run server:
 
