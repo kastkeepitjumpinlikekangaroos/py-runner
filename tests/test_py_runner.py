@@ -6,7 +6,7 @@ import unittest
 SOCKET_LOC = '/tmp/py_runner.sock'
 
 
-class TestStringMethods(unittest.TestCase):
+class TestSend(unittest.TestCase):
     def test_send(self):
         with multiprocessing.Pool() as p:
             iter_ = [i for i in range(40)]
