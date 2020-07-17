@@ -51,8 +51,12 @@ def _exec_code(code: str) -> bytes:
         f.write(code.encode())
         f.seek(0)
         try:
-            cmd = f'docker run py_exec -v {f.name}:/tmp/run.py'
-            if os.environ.get('DEBUG'):
+            if os.environ.get('SECURE'):  # use container
+                cmd = 'docker'
+                if os.environ.get('PODMAN'):
+                    cmd = 'podman'  # use podman instead of docker
+                cmd = f'{cmd} run -v {f.name}:/py_exec/run.py:z py_exec'
+            else:
                 cmd = f'python3 {f.name}'
             output = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as e:
