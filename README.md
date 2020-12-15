@@ -18,4 +18,4 @@ Run server:
 
 First start server and then run tests with
 
-`$ python3 -m unittest tests/test*`
+`$ python3 -m unittest test_py_runner.py`
